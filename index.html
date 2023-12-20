@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+    <title>Memory Game</title>
+</head>
+<body>
+    <template>
+        <div class="card p-3 mx-2">
+            <img class="card-img">
+        </div>
+    </template>
+
+    <div class="d-flex justify-content-around">
+        <p class="font-weight-bold">Game "Memory"</p>
+        <button class="finish-btn mt-1" type="submit">FINISH</button>
+    </div>
+    <hr>
+    <div class="memory-board d-flex flex-wrap"></div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        function flipCard(cardElement, imgUrl) {
+        cardElement.animate({
+            opacity: 0.5
+        }, 250, function () {
+            cardElement.css('background-image', 'url(' + imgUrl + ')');
+            cardElement.animate({
+                opacity: 1,
+            }, 250);
+        });
+    }
+
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                let j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        let template = $('template').contents();
+        let memoryBoard = $('.memory-board');
+        let flippedCards = [];
+
+        let array = [
+            { img: "free-icon-rounded-square-8847283.png", flipped: false, matched: false },
+            { img: "free-icon-rounded-square-8847283.png", flipped: false, matched: false },
+            { img: "free-icon-heart-simple-shape-silhouette-32557.png", flipped: false, matched: false },
+            { img: "free-icon-heart-simple-shape-silhouette-32557.png", flipped: false, matched: false },
+            { img: "free-icon-down-5548156.png", flipped: false, matched: false },
+            { img: "free-icon-down-5548156.png", flipped: false, matched: false },
+            { img: "free-icon-circle-594846.png", flipped: false, matched: false },
+            { img: "free-icon-circle-594846.png", flipped: false, matched: false },
+            { img: "free-icon-star-1828884.png", flipped: false, matched: false },
+            { img: "free-icon-star-1828884.png", flipped: false, matched: false }
+        ];
+
+        array = shuffleArray(array);
+
+        for (let i = 0; i < array.length; i++) {
+            let clone = template.clone(true);
+            (function (index) {
+                clone.click(function () {
+                    if (!($(this).data('card').flipped) && flippedCards.length < 2) {
+                        $(this).data('card').flipped = true;
+                        flippedCards.push($(this));
+
+                        flipCard($(this), array[index].img);
+
+                        if (flippedCards.length === 2) {
+                            setTimeout(checkCards, 500); // Adjust the delay if needed
+                        }
+                    }
+                });
+            })(i);
+            clone.data('card', array[i]);
+
+            memoryBoard.append(clone);
+        }
+
+        document.body.append(memoryBoard);
+
+        function checkCards() {
+            let card1 = flippedCards[0].data('card');
+            let card2 = flippedCards[1].data('card');
+
+            if (card1.img == card2.img) {
+                card1.matched = true;
+                card2.matched = true;
+
+                flippedCards[0].css('background-image', 'url(' + card1.img + ')');
+                flippedCards[1].css('background-image', 'url(' + card2.img + ')');
+                flippedCards[0].animate({
+                    opacity:0.5,
+                })
+                flippedCards[1].animate({
+                    opacity:0.5,
+                })
+                flippedCards = [];
+            } else {
+                setTimeout(function () {
+                    flippedCards.forEach(function (card) {
+                        if (!card.matched) {
+                            card.data('card').flipped = false;
+                            card.css('background-image', 'url(free-icon-playing-card-12427692.png)');
+                        }
+                    });
+
+                    flippedCards = [];
+                }, 1000); 
+            }
+
+            if (array.every(card => card.matched)) {
+                alert("Congratulations! You've matched all pairs.");
+                resetGame(); 
+            }
+        }
+
+        function resetGame() {
+            memoryBoard.empty();
+            flippedCards = [];
+            array = [
+                { img: "free-icon-rounded-square-8847283.png", flipped: false, matched: false },
+                { img: "free-icon-rounded-square-8847283.png", flipped: false, matched: false },
+                { img: "free-icon-heart-simple-shape-silhouette-32557.png", flipped: false, matched: false },
+                { img: "free-icon-heart-simple-shape-silhouette-32557.png", flipped: false, matched: false },
+                { img: "free-icon-down-5548156.png", flipped: false, matched: false },
+                { img: "free-icon-down-5548156.png", flipped: false, matched: false },
+                { img: "free-icon-circle-594846.png", flipped: false, matched: false },
+                { img: "free-icon-circle-594846.png", flipped: false, matched: false },
+                { img: "free-icon-star-1828884.png", flipped: false, matched: false },
+                { img: "free-icon-star-1828884.png", flipped: false, matched: false }
+            ];
+            array = shuffleArray(array);
+
+            for (let i = 0; i < array.length; i++) {
+                let clone = template.clone(true);
+                (function (index) {
+                    clone.click(function () {
+                        if (!($(this).data('card').flipped) && flippedCards.length < 2) {
+                            $(this).data('card').flipped = true;
+                            flippedCards.push($(this));
+
+                            flipCard($(this), array[index].img);
+
+                            if (flippedCards.length === 2) {
+                                setTimeout(checkCards, 500); 
+                            }
+                        }
+                    });
+                })(i);
+                clone.data('card', array[i]);
+
+                memoryBoard.append(clone);
+            }
+        }
+    </script>
+</body>
+</html>
